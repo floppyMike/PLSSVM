@@ -13,6 +13,8 @@ project(
     DESCRIPTION "A Least Squares Support Vector Machine implementation using different backends."
 )
 
+find_package(AdaptiveCpp REQUIRED) # TODO hotfix
+
 # include some generally used utility scripts
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_coverage_build_type.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/utility_macros.cmake)
@@ -921,3 +923,5 @@ install(
           "${CMAKE_CURRENT_SOURCE_DIR}/cmake/plssvm/plssvmstdparTargets.cmake"
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/plssvm/cmake
 )
+
+add_sycl_to_target(TARGET ${PLSSVM_BASE_LIBRARY_NAME}) # TODO hotfix
