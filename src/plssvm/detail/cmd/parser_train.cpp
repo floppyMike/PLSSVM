@@ -70,6 +70,7 @@ parser_train::parser_train(int argc, char **argv) {
            ("c,cost", "set the parameter C", cxxopts::value<decltype(csvm_params.cost)>()->default_value(fmt::format("{}", csvm_params.cost)))
            ("e,epsilon", "set the tolerance of termination criterion", cxxopts::value<decltype(epsilon)>()->default_value(fmt::format("{}", epsilon)))
            ("i,max_iter", "set the maximum number of CG iterations (default: num_features)", cxxopts::value<long long int>())
+           ("j,jitter", "set the diagonal summand for cholesky", cxxopts::value<decltype(jitter)>()->default_value(fmt::format("{}", jitter)))
            ("l,solver", "choose the solver: automatic|cg_explicit|cg_implicit", cxxopts::value<decltype(solver)>()->default_value("automatic"))
            ("a,classification", "the classification strategy to use for multi-class classification: oaa|oao", cxxopts::value<decltype(classification)>()->default_value(fmt::format("{}", classification)))
            ("b,backend", fmt::format("choose the backend: {}", fmt::join(list_available_backends(), "|")), cxxopts::value<decltype(backend)>()->default_value(fmt::format("{}", backend)))
@@ -172,6 +173,19 @@ parser_train::parser_train(int argc, char **argv) {
         }
         // provided max_iter was legal -> override default value
         max_iter = static_cast<decltype(max_iter)>(max_iter_input);
+    }
+
+    // parse jitter
+    if (result.count("jitter")) {
+        const auto jitter_input = result["jitter"].as<real_type>();
+        // check if the provided jitter is legal
+        if (jitter_input <= decltype(jitter_input){ 0 }) {
+            std::cerr << fmt::format(fmt::fg(fmt::color::red), "ERROR: jitter must be greater or equal than 0, but is {}!\n", jitter_input) << std::endl;
+            std::cout << options.help() << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        // provided jitter was legal -> override default value
+        jitter = static_cast<decltype(jitter)>(jitter_input);
     }
 
     // parse the classification type
@@ -309,6 +323,7 @@ std::ostream &operator<<(std::ostream &out, const parser_train &params) {
     } else {
         out << fmt::format("max_iter: {}\n", params.max_iter);
     }
+    out << fmt::format("jitter: {}\n", params.jitter);
 
     out << fmt::format(
         "backend: {}\n"

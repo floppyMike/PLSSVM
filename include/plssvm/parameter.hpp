@@ -48,6 +48,8 @@ IGOR_MAKE_NAMED_ARGUMENT(cost);
 IGOR_MAKE_NAMED_ARGUMENT(epsilon);
 /// Create a named argument for the maximum number of iterations `max_iter` performed in the CG algorithm.
 IGOR_MAKE_NAMED_ARGUMENT(max_iter);
+/// Create a named argument for the diagonal summand value `jitter` of the cholesky algorithm.
+IGOR_MAKE_NAMED_ARGUMENT(jitter);
 /// Create a named argument for the used solver type.
 IGOR_MAKE_NAMED_ARGUMENT(solver);
 /// Create a named argument for the classification type used for fitting a model.

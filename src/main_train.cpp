@@ -103,10 +103,12 @@ int main(int argc, char *argv[]) {
                 cmd_parser.max_iter == std::size_t{ 0 }
                     ? svm->fit(data,
                                plssvm::epsilon = cmd_parser.epsilon,
+                               plssvm::jitter = cmd_parser.jitter,
                                plssvm::classification = cmd_parser.classification,
                                plssvm::solver = cmd_parser.solver)
                     : svm->fit(data,
                                plssvm::epsilon = cmd_parser.epsilon,
+                               plssvm::jitter = cmd_parser.jitter,
                                plssvm::max_iter = cmd_parser.max_iter,
                                plssvm::classification = cmd_parser.classification,
                                plssvm::solver = cmd_parser.solver);

@@ -51,6 +51,8 @@ struct parser_train {
     real_type epsilon = static_cast<real_type>(1e-3);
     /// The maximum number of iterations in the CG algorithm.
     std::size_t max_iter{ 0 };
+    /// Diagonal summand in the cholesky algorithm.
+    real_type jitter{ 0. };
     /// The multi-class classification strategy used.
     classification_type classification{ classification_type::oaa };
 
