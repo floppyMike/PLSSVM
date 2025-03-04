@@ -292,6 +292,7 @@ std::vector<::plssvm::detail::move_only_any> gpu_csvm<device_ptr_t, queue_t, pin
                 // unreachable
                 break;
             case solver_type::cg_explicit:
+            case solver_type::cholesky:
                 {
                     // explicitly assemble the (potential partial) kernel matrix
                     device_ptr_type kernel_matrix = this->run_assemble_kernel_matrix_explicit(device_id, exec, params, data_d[device_id], q_red_d[device_id], QA_cost);
@@ -382,6 +383,7 @@ void gpu_csvm<device_ptr_t, queue_t, pinned_memory_t>::blas_level_3(const solver
 
         switch (solver) {
             case solver_type::automatic:
+            case solver_type::cholesky:
                 // unreachable
                 break;
             case solver_type::cg_explicit:

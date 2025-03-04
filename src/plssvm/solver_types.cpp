@@ -25,6 +25,8 @@ std::ostream &operator<<(std::ostream &out, const solver_type solving) {
             return out << "cg_explicit";
         case solver_type::cg_implicit:
             return out << "cg_implicit";
+        case solver_type::cholesky:
+            return out << "cholesky";
     }
     return out << "unknown";
 }
@@ -40,6 +42,8 @@ std::istream &operator>>(std::istream &in, solver_type &solving) {
         solving = solver_type::cg_explicit;
     } else if (str == "cg_implicit") {
         solving = solver_type::cg_implicit;
+    } else if (str == "cholesky") {
+        solving = solver_type::cholesky;
     } else {
         in.setstate(std::ios::failbit);
     }

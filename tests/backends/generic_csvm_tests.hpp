@@ -196,6 +196,7 @@ template <typename csvm_type, typename device_ptr_type, typename matrix_type, ty
                 return result;  // dummy return only necessary for the DeathTests -> VALUE NOT USED!
             }
         case plssvm::solver_type::cg_explicit:
+        case plssvm::solver_type::cholesky:
             // no additional arguments are used
             return init_explicit_matrices<csvm_type, device_ptr_type>(std::move(matr), csvm);
         case plssvm::solver_type::cg_implicit:
