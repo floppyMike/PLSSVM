@@ -285,6 +285,14 @@ class csvm {
      */
     [[nodiscard]] std::pair<soa_matrix<real_type>, std::vector<unsigned long long>> conjugate_gradients(const std::vector<detail::move_only_any> &A, const soa_matrix<real_type> &B, real_type eps, unsigned long long max_cg_iter, solver_type cg_solver) const;
     /**
+     * @brief Solve the system of linear equations `AX = B` where `A` is the kernel matrix using the Cholesky Decomposition algorithm.
+     * @param[in] A the kernel matrix; currently only one device
+     * @param[in] B the right-hand sides
+     * @param[in] jitter the value added to the diagonal during decomposition to avoid nan due to floating point errors at the cost of accuracy
+     * @return the result matrix `X` and the number of iterations using in the cholesky decomposition (`[[nodiscard]]`)
+     */
+    [[nodiscard]] std::pair<soa_matrix<real_type>, std::vector<unsigned long long>> cholesky(const std::vector<detail::move_only_any> &A, const soa_matrix<real_type> &B, real_type jitter) const;
+    /**
      * @brief Perform a dimensional reduction for the kernel matrix.
      * @details Reduces the resulting dimension by `2` compared to the original LS-SVM formulation.
      * @param[in] params the parameter used for the kernel matrix
@@ -940,10 +948,14 @@ std::tuple<aos_matrix<real_type>, std::vector<real_type>, std::vector<unsigned l
     }
     PLSSVM_DETAIL_TRACKING_PERFORMANCE_TRACKER_ADD_TRACKING_ENTRY((detail::tracking::tracking_entry{ "kernel_matrix", "kernel_matrix_assembly", assembly_duration }));
 
-    // choose the correct algorithm based on the (provided) solver type -> currently only CG available
+    // choose the correct algorithm based on the (provided) solver type -> currently only CG and cholesky available
     soa_matrix<real_type> X{};
     std::vector<unsigned long long> num_iter{};
-    std::tie(X, num_iter) = this->conjugate_gradients(kernel_matrix, B_red, used_epsilon, used_max_iter, used_solver);
+    if (used_solver == solver_type::cholesky) {
+        std::tie(X, num_iter) = this->cholesky(kernel_matrix, B_red, used_jitter);
+    } else {
+        std::tie(X, num_iter) = this->conjugate_gradients(kernel_matrix, B_red, used_epsilon, used_max_iter, used_solver);
+    }
 
     // calculate bias and undo dimensional reduction
     aos_matrix<real_type> X_ret{ shape{ num_rhs, A.num_rows() }, shape{ PADDING_SIZE, PADDING_SIZE } };
