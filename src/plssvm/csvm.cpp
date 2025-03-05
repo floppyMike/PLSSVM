@@ -474,8 +474,7 @@ std::pair<soa_matrix<real_type>, std::vector<unsigned long long>> csvm::cholesky
     real_type *gpuA = A_d.get();
 
     // Create own SYCL queue
-    ::sycl::queue q(::sycl::gpu_selector_v);  // This thing... specifing inorder just does nothing lol XDDDD
-                                              // Not even a warning!!!! Just a sad depressing crash
+    ::sycl::queue q(::sycl::gpu_selector_v);
 
     // Constants
     const auto N = B.num_cols();             // Matrix and vector size
@@ -495,11 +494,7 @@ std::pair<soa_matrix<real_type>, std::vector<unsigned long long>> csvm::cholesky
     };
 
     // Allocate and Copy B matrix
-    std::vector<real_type> paddedB(blockvec_idx_alloc<WIDTH>(Ndiv, Nbdiv));  // soa_matrix.data() does NOT store data as I was told :(((
-                                                                             // It's not row for row but it packs them in structlike
-                                                                             // bundles and stores them after eachother in an array.
-                                                                             // Like an array of structs (AoS) ... huh
-                                                                             // Am I miss understanding something?
+    std::vector<real_type> paddedB(blockvec_idx_alloc<WIDTH>(Ndiv, Nbdiv));
     for (size_t i = 0; i < B.num_rows(); ++i) {
         for (size_t j = 0; j < B.num_cols(); ++j) {
             paddedB[vecindex(i, j)] = B.at(i, j);
@@ -895,18 +890,16 @@ std::pair<soa_matrix<real_type>, std::vector<unsigned long long>> csvm::cholesky
 
     q.memcpy(paddedB.data(), gpuB, paddedB.size() * sizeof(real_type), e).wait_and_throw();
 
-    auto X = soa_matrix<real_type>(B.shape());  // This has a constructor taking in a padding in form of a shape with the parameters x, y
-                                                // x is the width ... right? ... oh soa_matrix.num_rows() returns the x......... :(
-                                                // Or maybe I'm just really blind
+    auto X = soa_matrix<real_type>(B.shape());
     for (size_t i = 0; i < X.num_rows(); ++i) {
         for (size_t j = 0; j < X.num_cols(); ++j) {
-            X.at(i, j) = paddedB[vecindex(i, j)];  // Use .at(). trust nothing. everything here is out to get me
+            X.at(i, j) = paddedB[vecindex(i, j)];
         }
     }
 
     PLSSVM_DETAIL_TRACKING_PERFORMANCE_TRACKER_ADD_EVENT("cholesky end");
 
-    return std::make_pair(X, std::vector<unsigned long long>(N, 0));  // Holy **** it **** works :)))))))
+    return std::make_pair(X, std::vector<unsigned long long>(N, 0));
 }
 
 // ------------------------------------
